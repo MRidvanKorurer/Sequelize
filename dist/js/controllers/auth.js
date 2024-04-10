@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.login = exports.register = void 0;
+exports.me = exports.login = exports.register = void 0;
 const auth_1 = __importDefault(require("../models/auth"));
 const error_1 = __importDefault(require("../utils/error"));
 const response_1 = __importDefault(require("../utils/response"));
@@ -59,3 +59,13 @@ const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* ()
     return new response_1.default("Giriş İşlemi Başarılı", user, token).success(res);
 });
 exports.login = login;
+const me = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const user = req.user;
+    try {
+        return new response_1.default("İşlem Başarılı Yetkilisiniz", user).success(res);
+    }
+    catch (error) {
+        throw new error_1.default("İşlem Başarısız", 400);
+    }
+});
+exports.me = me;

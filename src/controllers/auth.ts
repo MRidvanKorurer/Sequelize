@@ -63,3 +63,12 @@ export const login = async (req: Request, res:Response, next: NextFunction) => {
 
 
 
+export const me = async (req: any, res: Response) => {
+    const  user = req.user;
+
+    try {
+        return new IResponse("İşlem Başarılı Yetkilisiniz", user).success(res);
+    } catch (error) {
+        throw new APIError("İşlem Başarısız", 400);
+    }
+}
