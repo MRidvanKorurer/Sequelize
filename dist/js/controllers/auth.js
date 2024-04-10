@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.register = void 0;
+exports.login = exports.register = void 0;
 const auth_1 = __importDefault(require("../models/auth"));
 const error_1 = __importDefault(require("../utils/error"));
 const response_1 = __importDefault(require("../utils/response"));
@@ -33,10 +33,29 @@ const register = (req, res, next) => __awaiter(void 0, void 0, void 0, function*
             expiresIn: "7d",
             algorithm: "HS512"
         });
-        return new response_1.default("Kayıt İşlemi Başarılı", null, token).created(res);
+        return new response_1.default("Kayıt İşlemi Başarılı", newUser, token).created(res);
     }
     catch (error) {
         throw new error_1.default("Kayıt İşlemi Başarısız", 400);
     }
 });
 exports.register = register;
+const login = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const { email, password } = req.body;
+    const user = yield auth_1.default.findOne({
+        where: { email: email }
+    });
+    if (!user) {
+        return next(new error_1.default("Email adresi hatalı", 401));
+    }
+    const comparePassword = yield bcrypt_1.default.compare(password, user.password);
+    if (!comparePassword) {
+        return next(new error_1.default("Parola Hatalı", 401));
+    }
+    const token = jsonwebtoken_1.default.sign({ sub: user.id }, process.env.JWT_KEY || "", {
+        expiresIn: "7d",
+        algorithm: "HS512"
+    });
+    return new response_1.default("Giriş İşlemi Başarılı", user, token).success(res);
+});
+exports.login = login;
